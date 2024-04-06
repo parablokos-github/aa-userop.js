@@ -74,11 +74,11 @@ export class Instance<A extends Abi, F extends Abi> {
     this.onBuild = opts.onBuild;
   }
 
-  private getInitCode(): Hex {
+  private async getInitCode(): Promise<Hex> {
     if (this.initCode === "0x") {
       this.initCode = concat([
         this.factoryAddress,
-        this.setFactoryData(this.salt, (method, inputs) => {
+        await this.setFactoryData(this.salt, (method, inputs) => {
           return encodeFunctionData({
             abi: this.factoryAbi as Abi,
             functionName: method as string,
@@ -117,7 +117,7 @@ export class Instance<A extends Abi, F extends Abi> {
 
     return {
       nonce,
-      initCode: code === undefined ? this.getInitCode() : "0x",
+      initCode: code === undefined ? await this.getInitCode() : "0x",
     };
   }
 
@@ -211,7 +211,7 @@ export class Instance<A extends Abi, F extends Abi> {
           address: this.entryPointAddress,
           abi: EntryPoint.CONTRACT_ABI,
           functionName: "getSenderAddress",
-          args: [this.getInitCode()],
+          args: [await this.getInitCode()],
         });
       } catch (error) {
         if (error instanceof BaseError) {

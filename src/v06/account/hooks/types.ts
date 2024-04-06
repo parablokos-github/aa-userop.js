@@ -13,7 +13,7 @@ export type SetFactoryDataFunc<F extends Abi> = (
     method: M,
     inputs: AbiParametersToPrimitiveTypes<ExtractAbiFunction<F, M>["inputs"]>,
   ) => Hex,
-) => Hex;
+) => Promise<Hex>;
 
 export type RequestSignatureFunc = (
   type: "dummy" | "final",
