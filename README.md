@@ -16,7 +16,7 @@ Steps for setting up a local dev environment for contributing to userop.js.
 
 ## Prerequisites
 
-- Node 16 or later
+- Node >=18.0.0
 - [ERC-4337 Devnet](https://github.com/stackup-wallet/erc-4337-devnet) running
 
 ## Setup
