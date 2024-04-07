@@ -13,31 +13,20 @@ import { RequestSignature } from "../hooks";
 
 const FACTORY_ADDRESS = "0x9406Cc6185a346906296840746125a0E44976454";
 
-type SimpleAccountArgsWithViemEOA<E extends WalletClient> = [
+export function base(
   ethClient: PublicClient | JsonRpcProvider,
-  eoa: E,
-];
-type SimpleAccountArgsWithViemEOANoHoist<E extends WalletClient> = [
-  ethClient: PublicClient | JsonRpcProvider,
-  eoa: E,
+  eoa: WalletClient<Transport, Chain | undefined, undefined>,
   account: Account,
-];
-type SimpleAccountArgsWithEthersSigner<E extends Signer> = [
+): RequiredAccountOpts<typeof AccountAbi, typeof FactoryAbi>;
+export function base(
   ethClient: PublicClient | JsonRpcProvider,
-  eoa: E,
-];
-
-export const base = <E extends WalletClient | Signer>(
-  ...args: E extends WalletClient
-    ? E["account"] extends Account
-      ? SimpleAccountArgsWithViemEOA<E>
-      : SimpleAccountArgsWithViemEOANoHoist<E>
-    : E extends Signer
-      ? SimpleAccountArgsWithEthersSigner<E>
-      : never
-): RequiredAccountOpts<typeof AccountAbi, typeof FactoryAbi> => {
-  const [ethClient, eoa, account] = args;
-
+  eoa: WalletClient<Transport, Chain | undefined, Account> | Signer,
+): RequiredAccountOpts<typeof AccountAbi, typeof FactoryAbi>;
+export function base(
+  ethClient: PublicClient | JsonRpcProvider,
+  eoa: Signer | WalletClient,
+  account?: Account,
+): RequiredAccountOpts<typeof AccountAbi, typeof FactoryAbi> {
   return {
     accountAbi: AccountAbi,
     factoryAbi: FactoryAbi,
@@ -58,10 +47,13 @@ export const base = <E extends WalletClient | Signer>(
     requestSignature:
       "getAddresses" in eoa
         ? account !== undefined
-          ? RequestSignature.withViemWalletClient(eoa, account)
+          ? RequestSignature.withViemWalletClient(
+              eoa as WalletClient<Transport, Chain | undefined, undefined>,
+              account,
+            )
           : RequestSignature.withViemWalletClient(
               eoa as WalletClient<Transport, Chain | undefined, Account>,
             )
         : RequestSignature.withEthersSigner(eoa),
   };
-};
+}

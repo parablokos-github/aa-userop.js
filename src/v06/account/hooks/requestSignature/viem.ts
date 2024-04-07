@@ -2,11 +2,17 @@ import { WalletClient, Account, Transport, Chain } from "viem";
 import { privateKeyToAccount, generatePrivateKey } from "viem/accounts";
 import { RequestSignatureFunc } from "../types";
 
-export const withViemWalletClient = <W extends WalletClient>(
-  ...args: W["account"] extends Account
-    ? [client: W]
-    : [client: W, account: Account]
-): RequestSignatureFunc => {
+export function withViemWalletClient(
+  client: WalletClient<Transport, Chain | undefined, undefined>,
+  account: Account,
+): RequestSignatureFunc;
+export function withViemWalletClient(
+  client: WalletClient<Transport, Chain | undefined, Account>,
+): RequestSignatureFunc;
+export function withViemWalletClient(
+  client: WalletClient,
+  account?: Account,
+): RequestSignatureFunc {
   const dummy = privateKeyToAccount(generatePrivateKey());
   return async (type, message) => {
     switch (type) {
@@ -15,7 +21,6 @@ export const withViemWalletClient = <W extends WalletClient>(
       }
 
       case "final": {
-        const [client, account] = args;
         if (account) {
           return client.signMessage({ account, message: { raw: message } });
         }
@@ -27,4 +32,4 @@ export const withViemWalletClient = <W extends WalletClient>(
       }
     }
   };
-};
+}

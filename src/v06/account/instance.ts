@@ -9,11 +9,10 @@ import {
   concat,
   encodeFunctionData,
   PublicClient,
-  BaseError,
-  ContractFunctionRevertedError,
   RpcStateOverride,
   Hex,
   zeroAddress,
+  isAddress,
 } from "viem";
 import { JsonRpcProvider, Contract } from "ethers";
 import {
@@ -213,20 +212,15 @@ export class Instance<A extends Abi, F extends Abi> {
           functionName: "getSenderAddress",
           args: [await this.getInitCode()],
         });
-      } catch (error) {
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (err) => err instanceof ContractFunctionRevertedError,
-          );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        const metaMessage = error?.metaMessages?.[1];
+        if (typeof metaMessage !== "string") throw error;
 
-          if (revertError instanceof ContractFunctionRevertedError) {
-            this.sender = revertError.data?.args?.[0] as Address;
-          } else {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
+        const addr = metaMessage.trim().slice(1, -1);
+        if (!isAddress(addr)) throw error;
+
+        this.sender = addr;
       }
     }
 
