@@ -24,6 +24,12 @@ import * as Hooks from "./hooks";
 import * as Bundler from "../bundler";
 import * as EntryPoint from "../entryPoint";
 
+function isJsonRpcProvider(
+  client: PublicClient | JsonRpcProvider,
+): client is JsonRpcProvider {
+  return client instanceof JsonRpcProvider;
+}
+
 export class Instance<A extends Abi, F extends Abi> {
   private readonly accountAbi: A;
   private readonly factoryAbi: F;
@@ -65,7 +71,9 @@ export class Instance<A extends Abi, F extends Abi> {
     this.requestSignature = opts.requestSignature;
     this.requestGasPrice =
       opts.requestGasPrice ??
-      Hooks.RequestGasPrice.withEthClient(this.ethClient);
+      (this.ethClient instanceof JsonRpcProvider
+        ? Hooks.RequestGasPrice.withEthJsonRpcProvider(this.ethClient)
+        : Hooks.RequestGasPrice.withEthPublicClient(this.ethClient));
     this.requestGasValues =
       opts.requestGasValues ??
       Hooks.RequestGasValues.withEthClient(this.bundlerClient);
@@ -91,11 +99,9 @@ export class Instance<A extends Abi, F extends Abi> {
   }
 
   private async getChainId(): Promise<number> {
-    if (this.ethClient instanceof JsonRpcProvider) {
-      const network = await this.ethClient.getNetwork();
-      return Number(network.chainId);
-    }
-    return this.ethClient.getChainId();
+    return isJsonRpcProvider(this.ethClient)
+      ? Number((await this.ethClient.getNetwork()).chainId)
+      : this.ethClient.getChainId();
   }
 
   private async getByteCode(address: Address): Promise<string | undefined> {
