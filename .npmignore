@@ -5,4 +5,4 @@ src
 .prettierrc.json
 eslint.config.js
 jest.config.js
-tsconfig.json
+tsconfig.*.*
