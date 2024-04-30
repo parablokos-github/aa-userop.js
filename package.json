@@ -14,7 +14,7 @@
     "clean": "rimraf dist",
     "build": "yarn clean &&  tsc -p ./tsconfig.build.json",
     "test": "jest",
-    "lint": "eslint . && tsc --noEmit",
+    "lint": "eslint . && tsc --noEmit -p ./tsconfig.build.json",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check '**'",
     "prettier:fix": "prettier --write '**'"
@@ -35,7 +35,6 @@
     "@arktype/attest": "^0.7.0",
     "abitype": "^1.0.0",
     "ethers": "^6.11.1",
-    "userop": "^0.4.0-beta.5",
     "viem": "^2.9.12"
   }
 }

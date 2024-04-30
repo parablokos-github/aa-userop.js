@@ -1,4 +1,4 @@
-import { WalletClient, Transport, Chain, Account } from "viem";
+import { WalletClient, Account, Transport, Chain } from "viem";
 import { privateKeyToAccount, generatePrivateKey } from "viem/accounts";
 import { RequestSignatureFunc } from "../types";
 
