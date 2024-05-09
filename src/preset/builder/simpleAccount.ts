@@ -109,9 +109,13 @@ export class SimpleAccount extends UserOperationBuilder {
     );
   }
 
-  executeBatch(to: Array<string>, data: Array<BytesLike>) {
+  executeBatch(
+    to: Array<string>,
+    value: Array<BigNumberish>,
+    data: Array<BytesLike>
+  ) {
     return this.setCallData(
-      this.proxy.interface.encodeFunctionData("executeBatch", [to, data])
+      this.proxy.interface.encodeFunctionData("executeBatch", [to, value, data])
     );
   }
 }

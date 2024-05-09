@@ -146,6 +146,11 @@ const _abi = [
         type: "address[]",
       },
       {
+        internalType: "uint256[]",
+        name: "value",
+        type: "uint256[]",
+      },
+      {
         internalType: "bytes[]",
         name: "func",
         type: "bytes[]",
